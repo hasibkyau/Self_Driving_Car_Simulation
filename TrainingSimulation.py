@@ -19,3 +19,5 @@ xTrain, xVal, yTrain, yVal = train_test_split(imagesPath, steerings, test_size=0
 print('Total Training Images: ',len(xTrain))
 print('Total Validation Images: ',len(xVal))
 
+model = createModel()
+model.summary()
