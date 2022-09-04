@@ -6,7 +6,7 @@ import socketio
 import eventlet
 import numpy as np
 from flask import Flask
-from tensorflow.keras.models import load_model
+from keras.models import load_model
 import base64
 from io import BytesIO
 from PIL import Image
@@ -60,3 +60,4 @@ if __name__ == '__main__':
     app = socketio.Middleware(sio, app)
     ### LISTEN TO PORT 4567
     eventlet.wsgi.server(eventlet.listen(('', 4567)), app)
+
