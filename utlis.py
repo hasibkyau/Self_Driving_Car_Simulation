@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import os
 
 def getName(filePath):
@@ -19,3 +20,15 @@ def importDataInfo(path):
     # print(data.head())
     print('Total imported image: ', data.shape[0])
     return data
+
+def balanceData(data, display = True):
+    nBins = 31
+    samplesPerBin = 500
+    hist, bins = np.histogram(data['Steering'],nBins)
+    # print(hist)
+    # print(bins)
+    # there is no 0 and now we will create a center in bins
+    center = (bins[:-1]+bins[1:])*0.5
+    print(center)
+    plt.bar(center,hist,width = 0.06)
+    plt.show()
