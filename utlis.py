@@ -11,5 +11,11 @@ def importDataInfo(path):
     coloums = ['Center','Left','Right', 'Steering', 'Throttle', 'Brake', 'Speed']
     data = pd.read_csv(os.path.join(path,'driving_log.csv'), names = coloums)
     # print(data.head())
-    print(data['Center'][0])
-    print(getName(data['Center'][0]))
+    # print(data['Center'][0])
+    # print(getName(data['Center'][0]))
+
+    # we are applying the getName on the coloums of center camera and storing it on data
+    data['Center'] = data['Center'].apply(getName)
+    # print(data.head())
+    print('Total imported image: ', data.shape[0])
+    return data
