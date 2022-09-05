@@ -3,6 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from sklearn.utils import shuffle
+import matplotlib.image as mpimg
+from imgaug import augmenters as iaa
+import cv2
 
 def getName(filePath):
     #getting the image name by spliting the filePath with slash ('\\') and selecting the last part ([-1])
@@ -74,3 +77,32 @@ def loadData(path, data):
     imagesPath = np.asarray(imagesPath)
     steering = np.asarray(steering)
     return imagesPath, steering
+
+# Augment image function
+def augmentImage(imgPath, steering):
+    img = mpimg.imread(imgPath)
+    ## PAN
+    if np.random.rand() < 0.5:
+        pan = iaa.Affine(translate_percent={'x': (-0.1, 0.1), 'y':(-0.1,0.1)})
+        img = pan.augment_image(img)
+
+    ## ZOOM
+    if np.random.rand() < 0.5:
+        zoom = iaa.Affine(scale=(1,1.2))
+        img = zoom.augment_image(img)
+
+    ## BRIGHTNESS
+    if np.random.rand() < 0.5:
+        brightness = iaa.Multiply(0.3,1.2)
+        img = brightness.augment_image(img)
+
+    ## FLIP
+    if np.random.rand() < 0.5:
+        img = cv2.flip(img,1)
+        steering = - steering
+
+    return img, steering
+
+# imgRe, st = augmentImage('test.jpg',0)
+# plt.imshow(imgRe)
+# plt.show()
