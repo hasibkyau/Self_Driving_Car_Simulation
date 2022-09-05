@@ -60,3 +60,17 @@ def balanceData(data, display = True):
         plt.show()
 
     return data
+
+def loadData(path, data):
+    imagesPath = []
+    steering = []
+
+    for i in range (len(data)):
+        indexedData = data.iloc[i]
+        # print(indexedData)
+        imagesPath.append(os.path.join(path,'IMG',indexedData[0]))
+        # print(os.path.join(path,'IMG',indexedData[0]))
+        steering.append(float(indexedData[3]))
+    imagesPath = np.asarray(imagesPath)
+    steering = np.asarray(steering)
+    return imagesPath, steering
