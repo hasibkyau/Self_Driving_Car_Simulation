@@ -5,5 +5,5 @@ path = 'myData'
 data = importDataInfo(path)
 
 ###Step 02: Balance Data
-balanceData(data)
+data = balanceData(data,display=True)
 
