@@ -19,3 +19,6 @@ print('Total validation images: ', len(xVal))
 
 ### Step 05: Data Augmentation
 
+
+### Step 6: Preprocessing
+

@@ -106,3 +106,18 @@ def augmentImage(imgPath, steering):
 # imgRe, st = augmentImage('test.jpg',0)
 # plt.imshow(imgRe)
 # plt.show()
+
+
+## Croping image
+def preProcessing(img):
+    # croping the image
+    img = img[60:134, :,:]
+    # changing color
+    img = cv2.cvtColor(img,cv2.COLOR_RGB2YUV)
+    img = cv2.GaussianBlur(img, (3,3),0)
+    img = img/255
+    return img
+
+imgRe = preProcessing(mpimg.imread('test.jpg'))
+plt.imshow(imgRe)
+plt.show()
