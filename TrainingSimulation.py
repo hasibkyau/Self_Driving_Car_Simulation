@@ -9,15 +9,17 @@ data = importDataInfo(path)
 # print(type(data))
 # print(data)
 
-data = balanceData(data, display=False)
-# data = pd.DataFrame(data)
-print(len(data))
 
-imagesPath, steerings, speed = loadData(path,data)
-# print(speed)
 
 ##Train for steering
-def trainSteeringControl():
+def trainSteeringControl(data):
+    data = balanceData(data, display=False)
+    # data = pd.DataFrame(data)
+    print(len(data))
+
+    imagesPath, steerings, speed = loadData(path, data)
+    # print(speed)
+
     xTrain, xVal, yTrain, yVal = train_test_split(imagesPath, steerings, test_size=0.2,random_state=10)
     print('Total Training Images: ',len(xTrain))
     print('Total Validation Images: ',len(xVal))
@@ -25,10 +27,10 @@ def trainSteeringControl():
     model = createModel()
     model.summary()
 
-    history = model.fit(batchGen(xTrain, yTrain, 100, 1),
+    history = model.fit(steeringBatchGen(xTrain, yTrain, 100, 1),
                                       steps_per_epoch=300,
                                       epochs=10,
-                                      validation_data=batchGen(xVal, yVal, 100, 0),
+                                      validation_data=steeringBatchGen(xVal, yVal, 100, 0),
                                       validation_steps=200)
 
     model.save('strmodel.h5')
@@ -43,7 +45,14 @@ def trainSteeringControl():
 
 
 # ## Train speed:
-def trainSpeedControling():
+def trainSpeedControling(data):
+    data = balanceSpeedData(data, display=False)
+    # data = pd.DataFrame(data)
+    print(len(data))
+
+    imagesPath, steerings, speed = loadData(path, data)
+    # print(speed)
+
     xTrain, xVal, yTrain, yVal = train_test_split(imagesPath, speed, test_size=0.2,random_state=10)
     print('Total Training Images: ',len(xTrain))
     print('Total Validation Images: ',len(xVal))
@@ -54,13 +63,13 @@ def trainSpeedControling():
     print('steering: ',len(xTrain))
     print('speed: ',len(yTrain))
 
-    history = model.fit(batchGen(xTrain, yTrain, 100, 1),
+    history = model.fit(speedBatchGen(xTrain, yTrain, 100, 1),
                                       steps_per_epoch=300,
                                       epochs=10,
-                                      validation_data=batchGen(xVal, yVal, 100, 0),
+                                      validation_data=speedBatchGen(xVal, yVal, 100, 0),
                                       validation_steps=200)
 
-    model.save('spdModel.h5')
+    model.save('spdModel2  .h5')
     #loss = 17.7251
     print('Model Saved')
 
@@ -73,4 +82,4 @@ def trainSpeedControling():
 
 
 
-trainSpeedControling()
+trainSpeedControling(data)

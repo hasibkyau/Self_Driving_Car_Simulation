@@ -169,7 +169,7 @@ def preProcess(img):
     return img
 
 
-def batchGen(imagesPath, steeringList, batchSize, trainFlag):
+def steeringBatchGen(imagesPath, steeringList, batchSize, trainFlag):
     while True:
         imgBatch = []
         steeringBatch = []
@@ -177,7 +177,7 @@ def batchGen(imagesPath, steeringList, batchSize, trainFlag):
         for i in range(batchSize):
             index = random.randint(0, len(imagesPath) - 1)
             if trainFlag:
-                img, steering= augmentImage(imagesPath[index], steeringList[index], True)
+                img, steering = augmentImage(imagesPath[index], steeringList[index], True)
             else:
                 img = mpimg.imread(imagesPath[index])
                 steering = steeringList[index]
