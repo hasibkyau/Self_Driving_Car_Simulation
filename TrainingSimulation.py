@@ -24,3 +24,7 @@ print('Total validation images: ', len(xVal))
 
 ### Step 7: Batch Generation
 
+### Step 8: model create
+model = creatModel()
+model.summary()
+

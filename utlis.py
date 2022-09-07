@@ -7,6 +7,9 @@ import matplotlib.image as mpimg
 from imgaug import augmenters as iaa
 import cv2
 import random
+from keras.models import Sequential
+from keras.layers import Convolution2D, Flatten, Dense
+from keras.optimizers import Adam
 
 def getName(filePath):
     #getting the image name by spliting the filePath with slash ('\\') and selecting the last part ([-1])
@@ -140,3 +143,23 @@ def batchGen(imagesPath, steeringList, batchSize, trainFlag):
             steeringBatch.append(steering)
         yield (np.asarray(imgBatch), np.asarray(steeringBatch))
 
+def creatModel():
+    model = Sequential()
+
+    model.add(Convolution2D(24,(5,5),(2,2), input_shape=(66,200,3), activation= 'elu'))
+    model.add(Convolution2D(36, (5, 5), (2, 2), activation='elu'))
+    model.add(Convolution2D(48, (5, 5), (2, 2), activation='elu'))
+    model.add(Convolution2D(64, (3, 3), (1, 1), activation='elu'))
+    model.add(Convolution2D(64, (3, 3), (1, 1), activation='elu'))
+
+    model.add(Flatten())
+
+    model.add(Dense(100, activation='elu'))
+    model.add(Dense(50,activation='elu'))
+    model.add(Dense(10, activation='elu'))
+    model.add(Dense(1, activation='elu'))
+
+    ##Compile model: lr = lraring rate, loss = loss funciton
+    model.compile(Adam(lr=0.0001), loss='mse')
+
+    return model
