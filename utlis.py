@@ -20,7 +20,7 @@ def importDataInfo(path):
     columns = ['Center', 'Left', 'Right', 'Steering', 'Throttle', 'Brake', 'Speed']
     data = pd.read_csv(os.path.join(path, 'driving_log.csv'), names=columns)
     #### REMOVE FILE PATH AND GET ONLY FILE NAME
-    # print(getName(data['center'][0]))
+    # print(getName(data['strCenter'][0]))
     data['Center'] = data['Center'].apply(getName)
     # print(data.head())
     print('Total Images Imported', data.shape[0])
@@ -30,17 +30,36 @@ def importDataInfo(path):
 def balanceData(data,display=True):
     nBin = 31
     samplesPerBin = 500
-    hist, bins = np.histogram(data['Steering'], nBin)
+    ## Steering histogram
+    strhist, strBins = np.histogram(data['Steering'], nBin)
+    # print('str bins: ', strBins)
+    # print('str hist: ', strhist)
+    ## Speed histogram
+    spdhist, spdBins = np.histogram(data['Speed'],nBin)
+    # print('spd bins: ', spdBins)
+    # print('spd hist: ', spdhist)
+
+
+    
     if display:
-        center = (bins[:-1] + bins[1:]) * 0.5
-        plt.bar(center, hist, width=0.06)
-        plt.plot((np.min(data['Steering']), np.max(data['Steering'])), (samplesPerBin, samplesPerBin))
+        strCenter = (strBins[:-1] + strBins[1:]) * 0.5
+        # print('strCenter: ', strCenter)
+        spdCenter = (spdBins[:-1] + spdBins[1:]) * 0.5
+        print('spdCenter: ', spdCenter)
+
+        # plt.bar(strCenter, strhist, width=0.06)
+        # plt.plot((np.min(data['Steering']), np.max(data['Steering'])), (samplesPerBin, samplesPerBin))
+        # plt.show()
+
+        plt.bar(spdCenter, spdhist, width=0.06)
+        plt.plot((np.min(data['Speed']), np.max(data['Speed'])), (samplesPerBin, samplesPerBin))
         plt.show()
+
     removeindexList = []
     for j in range(nBin):
         binDataList = []
         for i in range(len(data['Steering'])):
-            if data['Steering'][i] >= bins[j] and data['Steering'][i] <= bins[j + 1]:
+            if data['Steering'][i] >= strBins[j] and data['Steering'][i] <= strBins[j + 1]:
                 binDataList.append(i)
         binDataList = shuffle(binDataList)
         binDataList = binDataList[samplesPerBin:]
@@ -54,25 +73,75 @@ def balanceData(data,display=True):
     # print(type(data))
 
     if display:
-        hist, _ = np.histogram(data['Steering'], (nBin))
-        plt.bar(center, hist, width=0.06)
-        plt.plot((np.min(data['Steering']), np.max(data['Steering'])), (samplesPerBin, samplesPerBin))
+        # strhist, _ = np.histogram(data['Steering'], (nBin))
+        # plt.bar(strCenter, strhist, width=0.06)
+        # plt.plot((np.min(data['Steering']), np.max(data['Steering'])), (samplesPerBin, samplesPerBin))
+        # plt.show()
+
+        spdhist, _ = np.histogram(data['Speed'], (nBin))
+        plt.bar(spdCenter, spdhist, width=0.06)
+        plt.plot((np.min(data['Speed']), np.max(data['Speed'])), (samplesPerBin, samplesPerBin))
         plt.show()
+
+    return data
+
+
+def balanceSpeedData(data, display=True):
+    nBin = 31
+    samplesPerBin = 500
+
+    ## Speed histogram
+    spdhist, spdBins = np.histogram(data['Speed'], nBin)
+    # print('spd bins: ', spdBins)
+    # print('spd hist: ', spdhist)
+
+    if display:
+        spdCenter = (spdBins[:-1] + spdBins[1:]) * 0.5
+        print('spdCenter: ', spdCenter)
+
+        plt.bar(spdCenter, spdhist, width=0.06)
+        plt.plot((np.min(data['Speed']), np.max(data['Speed'])), (samplesPerBin, samplesPerBin))
+        plt.show()
+
+    removeindexList = []
+    for j in range(nBin):
+        binDataList = []
+        for i in range(len(data['Speed'])):
+            if data['Speed'][i] >= spdBins[j] and data['Speed'][i] <= spdBins[j + 1]:
+                binDataList.append(i)
+        binDataList = shuffle(binDataList)
+        binDataList = binDataList[samplesPerBin:]
+        removeindexList.extend(binDataList)
+
+    print('Removed Images:', len(removeindexList))
+    data.drop(data.index[removeindexList], inplace=True)
+    print('Remaining Images:', len(data))
+
+    if display:
+        spdhist, _ = np.histogram(data['Speed'], (nBin))
+        plt.bar(spdCenter, spdhist, width=0.06)
+        plt.plot((np.min(data['Speed']), np.max(data['Speed'])), (samplesPerBin, samplesPerBin))
+        plt.show()
+
     return data
 
 
 def loadData(path, data):
   imagesPath = []
   steering = []
+  speed = []
   for i in range(len(data)):
     indexed_data = data.iloc[i]
     imagesPath.append(f'{path}/IMG/{indexed_data[0]}')
     steering.append(float(indexed_data[3]))
+    speed.append(float(indexed_data[6]))
+
   imagesPath = np.asarray(imagesPath)
   steering = np.asarray(steering)
-  return imagesPath, steering
+  speed = np.asarray(speed)
+  return imagesPath, steering, speed
 
-def augmentImage(imgPath,steering):
+def augmentImage(imgPath,steering,speed):
     img =  mpimg.imread(imgPath)
     if np.random.rand() < 0.5:
         pan = iaa.Affine(translate_percent={"x": (-0.1, 0.1), "y": (-0.1, 0.1)})
@@ -85,8 +154,8 @@ def augmentImage(imgPath,steering):
         img = brightness.augment_image(img)
     if np.random.rand() < 0.5:
         img = cv2.flip(img, 1)
-        steering = -steering
-    return img, steering
+        steering = - steering
+    return img, steering, speed
 
 
 
@@ -107,13 +176,15 @@ def batchGen(imagesPath, steeringList, batchSize, trainFlag):
         for i in range(batchSize):
             index = random.randint(0, len(imagesPath) - 1)
             if trainFlag:
-                img, steering = augmentImage(imagesPath[index], steeringList[index])
+                img, steering, speed = augmentImage(imagesPath[index], steeringList[index], speedList[index])
             else:
                 img = mpimg.imread(imagesPath[index])
                 steering = steeringList[index]
+
             img = preProcess(img)
             imgBatch.append(img)
             steeringBatch.append(steering)
+
         yield (np.asarray(imgBatch), np.asarray(steeringBatch))
 
 
