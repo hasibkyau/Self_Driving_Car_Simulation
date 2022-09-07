@@ -22,3 +22,5 @@ print('Total validation images: ', len(xVal))
 
 ### Step 6: Preprocessing
 
+### Step 7: Batch Generation
+

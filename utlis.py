@@ -6,6 +6,7 @@ from sklearn.utils import shuffle
 import matplotlib.image as mpimg
 from imgaug import augmenters as iaa
 import cv2
+import random
 
 def getName(filePath):
     #getting the image name by spliting the filePath with slash ('\\') and selecting the last part ([-1])
@@ -121,3 +122,21 @@ def preProcessing(img):
 imgRe = preProcessing(mpimg.imread('test.jpg'))
 plt.imshow(imgRe)
 plt.show()
+
+def batchGen(imagesPath, steeringList, batchSize, trainFlag):
+    while True:
+        imgBatch = []
+        steeringBatch = []
+
+        for i in range(batchSize):
+            index = random.randint(0, len(imagesPath) - 1)
+            if trainFlag:
+                img, steering = augmentImage(imagesPath[index], steeringList[index])
+            else:
+                img = mpimg.imread(imagesPath[index])
+                steering = steeringList[index]
+            img = preProcessing(img)
+            imgBatch.append(img)
+            steeringBatch.append(steering)
+        yield (np.asarray(imgBatch), np.asarray(steeringBatch))
+
