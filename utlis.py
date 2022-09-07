@@ -141,7 +141,7 @@ def loadData(path, data):
   speed = np.asarray(speed)
   return imagesPath, steering, speed
 
-def augmentImage(imgPath,steering,speed):
+def augmentImage(imgPath,steering,reverse):
     img =  mpimg.imread(imgPath)
     if np.random.rand() < 0.5:
         pan = iaa.Affine(translate_percent={"x": (-0.1, 0.1), "y": (-0.1, 0.1)})
@@ -154,8 +154,9 @@ def augmentImage(imgPath,steering,speed):
         img = brightness.augment_image(img)
     if np.random.rand() < 0.5:
         img = cv2.flip(img, 1)
-        steering = - steering
-    return img, steering, speed
+        if reverse:
+            steering = - steering
+    return img, steering
 
 
 
@@ -176,7 +177,7 @@ def batchGen(imagesPath, steeringList, batchSize, trainFlag):
         for i in range(batchSize):
             index = random.randint(0, len(imagesPath) - 1)
             if trainFlag:
-                img, steering, speed = augmentImage(imagesPath[index], steeringList[index], speedList[index])
+                img, steering= augmentImage(imagesPath[index], steeringList[index], True)
             else:
                 img = mpimg.imread(imagesPath[index])
                 steering = steeringList[index]
@@ -186,6 +187,27 @@ def batchGen(imagesPath, steeringList, batchSize, trainFlag):
             steeringBatch.append(steering)
 
         yield (np.asarray(imgBatch), np.asarray(steeringBatch))
+
+
+def speedBatchGen(imagesPath, speedList, batchSize, trainFlag):
+    while True:
+        imgBatch = []
+        speedBatch = []
+
+        for i in range(batchSize):
+            index = random.randint(0, len(imagesPath) - 1)
+            if trainFlag:
+                img, speed = augmentImage(imagesPath[index], speedList[index], False)
+            else:
+                img = mpimg.imread(imagesPath[index])
+                speed = speedList[index]
+
+            img = preProcess(img)
+            imgBatch.append(img)
+            speedBatch.append(speed)
+
+        yield (np.asarray(imgBatch), np.asarray(speedBatch))
+
 
 
 def createModel():

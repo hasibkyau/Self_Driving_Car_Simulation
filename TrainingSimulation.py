@@ -61,6 +61,7 @@ def trainSpeedControling():
                                       validation_steps=200)
 
     model.save('spdModel.h5')
+    #loss = 17.7251
     print('Model Saved')
 
     plt.plot(history.history['loss'])
