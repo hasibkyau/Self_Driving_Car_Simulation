@@ -57,7 +57,7 @@ def trainSpeedControling(data):
     print('Total Training Images: ',len(xTrain))
     print('Total Validation Images: ',len(xVal))
 
-    model = createModel()
+    model = speedModel()
     model.summary()
 
     print('steering: ',len(xTrain))

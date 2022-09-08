@@ -17,7 +17,7 @@ def getName(filePath):
 
 
 def importDataInfo(path):
-    columns = ['Center', 'Left', 'Right', 'Steering', 'Throttle', 'Brake', 'Speed']
+    columns = ['Center', 'Left', 'Right', 'Steering', 'Throttle', 'Brake', 'SpeedSpeed']
     data = pd.read_csv(os.path.join(path, 'driving_log.csv'), names=columns)
     #### REMOVE FILE PATH AND GET ONLY FILE NAME
     # print(getName(data['strCenter'][0]))
@@ -223,6 +223,24 @@ def createModel():
     model.add(Dense(100, activation='elu'))
     model.add(Dense(50, activation='elu'))
     model.add(Dense(10, activation='elu'))
+    model.add(Dense(1))
+
+    model.compile(Adam(lr=0.0001), loss='mse')
+    return model
+
+def speedModel():
+    model = Sequential()
+
+    model.add(Convolution2D(24, (5, 5), (2, 2), input_shape=(66, 200, 3), activation='relu'))
+    model.add(Convolution2D(36, (5, 5), (2, 2), activation='relu'))
+    model.add(Convolution2D(48, (5, 5), (2, 2), activation='relu'))
+    model.add(Convolution2D(64, (3, 3), activation='relu'))
+    model.add(Convolution2D(64, (3, 3), activation='relu'))
+
+    model.add(Flatten())
+    model.add(Dense(100, activation='relu'))
+    model.add(Dense(50, activation='relu'))
+    model.add(Dense(10, activation='relu'))
     model.add(Dense(1))
 
     model.compile(Adam(lr=0.0001), loss='mse')
