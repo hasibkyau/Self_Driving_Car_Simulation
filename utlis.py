@@ -120,6 +120,11 @@ def batchGen(imagesPath, steeringList, batchSize, trainFlag):
 def createModel():
     model = Sequential()
 
+    # # The inputs are 66x200x3(RGB) images with `channels_last` and the batch size is 24.
+    # For CNNs that are trained on images, for example, say your dataset is RGB (3-channel) images that are 256x256
+    # pixels. A single image can be represented by a 3 x 256 x 256 matrix.If you set your batch size to be 10, that
+    # means you’re concatenating 10 images together into a 10 x 3 x 256 x 256 matrix.
+
     model.add(Convolution2D(24, (5, 5), (2, 2), input_shape=(66, 200, 3), activation='elu'))
     model.add(Convolution2D(36, (5, 5), (2, 2), activation='elu'))
     model.add(Convolution2D(48, (5, 5), (2, 2), activation='elu'))
@@ -127,6 +132,7 @@ def createModel():
     model.add(Convolution2D(64, (3, 3), activation='elu'))
 
     model.add(Flatten())
+
     model.add(Dense(100, activation='elu'))
     model.add(Dense(50, activation='elu'))
     model.add(Dense(10, activation='elu'))
